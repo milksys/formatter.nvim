@@ -115,6 +115,10 @@ function M.start_task(configs, start_line, end_line, opts)
 
       -- Success
       if ignore_exitcode or data == 0 then
+        if current_output == nil then
+          current_output = { "" }
+        end
+
         log.info(string.format("Finished running %s", name))
         output = transform and transform(current_output) or current_output
       end
@@ -155,10 +159,7 @@ function M.start_task(configs, start_line, end_line, opts)
 
     if current.config.stdin then
       local job_id = vim.fn.jobstart(table.concat(cmd, " "), job_options)
-
-      if next(output) ~= nil then
-        vim.fn.chansend(job_id, output)
-      end
+      vim.fn.chansend(job_id, output)
 
       vim.fn.chanclose(job_id, "stdin")
     else
